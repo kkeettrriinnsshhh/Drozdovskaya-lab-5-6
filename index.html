@@ -6,11 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#493022">
 
-  <title>Хранитель песков — 3D-галерея</title>
+  <title>Хранитель песков — Лабораторная №6</title>
 
-  <script
-    type="module"
-    src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.4.0/model-viewer.min.js">
+  <!-- Three.js и совместимость с библиотекой эффектов -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./three-shim.js",
+      "three-real": "https://cdn.jsdelivr.net/npm/three@0.183.0/build/three.module.js"
+    }
+  }
+  </script>
+
+  <script type="module"
+    src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer-module.min.js">
+  </script>
+
+  <script type="module"
+    src="https://cdn.jsdelivr.net/npm/@google/model-viewer-effects@1.5.0/dist/model-viewer-effects.min.js">
   </script>
 
   <style>
@@ -26,26 +39,19 @@
       box-sizing: border-box;
     }
 
-    html {
-      min-height: 100%;
-      background: var(--brown);
-    }
-
-    body {
+    html, body {
       margin: 0;
-      min-height: 100vh;
+      min-height: 100%;
       background: var(--brown);
       color: var(--cream);
       font-family: Arial, sans-serif;
     }
 
     .container {
-      width: min(94%, 1050px);
+      width: min(96%, 1200px);
       margin: 0 auto;
-      padding: 48px 0 25px;
+      padding: 42px 0 25px;
     }
-
-    /* Заголовок */
 
     header {
       text-align: center;
@@ -58,42 +64,37 @@
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 3px;
-      text-transform: uppercase;
     }
 
     h1 {
       margin: 0;
-      color: var(--cream);
-      font-family: Georgia, "Times New Roman", serif;
+      font-family: Georgia, serif;
       font-size: clamp(42px, 7vw, 76px);
       font-weight: normal;
-      letter-spacing: 1px;
+      color: var(--cream);
     }
 
     .subtitle {
       margin: 16px 0 0;
       color: var(--gold);
       font-size: 15px;
-      letter-spacing: 0.5px;
     }
 
-    /* Область 3D-модели */
+    /* Основная область */
 
     .viewer-card {
       position: relative;
-      width: 100%;
       overflow: hidden;
-      border: 1px solid #92704D;
       border-radius: 24px;
+      border: 1px solid #92704D;
       background: var(--brown-light);
-      box-shadow:
-        0 25px 55px rgba(0, 0, 0, 0.22);
+      box-shadow: 0 25px 55px rgba(0,0,0,.22);
     }
 
     model-viewer {
       display: block;
       width: 100%;
-      height: 590px;
+      height: 610px;
 
       background: radial-gradient(
         ellipse at 50% 42%,
@@ -105,7 +106,77 @@
       --poster-color: transparent;
     }
 
-    /* Загрузка модели */
+    /* Панели управления */
+
+    .panel {
+      position: absolute;
+      top: 24px;
+      z-index: 10;
+      width: 195px;
+      padding: 17px;
+      border-radius: 16px;
+      background: rgba(53,33,22,.91);
+      border: 1px solid rgba(217,183,139,.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    }
+
+    .panel-left {
+      left: 24px;
+    }
+
+    .panel-right {
+      right: 24px;
+    }
+
+    .panel h2 {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-family: Georgia, serif;
+      font-size: 20px;
+      font-weight: normal;
+    }
+
+    .panel button {
+      display: block;
+      width: 100%;
+      margin: 8px 0 0;
+      padding: 11px 9px;
+
+      background: #765238;
+      border: 1px solid #A47B54;
+      border-radius: 9px;
+
+      color: var(--cream);
+      font-size: 12px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .panel button:hover:not(:disabled) {
+      background: #98704C;
+    }
+
+    .panel button.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--brown-deep);
+      font-weight: bold;
+    }
+
+    .panel button:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    .panel-note {
+      margin: 13px 0 0;
+      color: var(--gold);
+      font-size: 11px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    /* Загрузка */
 
     .loading {
       position: absolute;
@@ -118,8 +189,8 @@
       pointer-events: none;
     }
 
-    .loading.hidden {
-      display: none;
+    .hidden {
+      display: none !important;
     }
 
     /* Подпись */
@@ -129,49 +200,60 @@
       text-align: center;
     }
 
-    .footer-main {
+    footer p {
       margin: 0;
-      color: var(--cream);
       font-size: 13px;
-      letter-spacing: 0.5px;
     }
 
-    .footer-sub {
-      margin: 9px 0 0;
+    footer .small {
+      margin-top: 9px;
       color: var(--gold);
       font-size: 11px;
     }
 
-    /* Адаптация под телефон */
+    /* Телефоны */
 
-    @media (max-width: 600px) {
+    @media (max-width: 760px) {
       .container {
         padding-top: 35px;
       }
 
-      header {
-        margin-bottom: 25px;
+      .viewer-card {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 18px;
       }
 
-      .eyebrow {
-        font-size: 10px;
-        letter-spacing: 2px;
+      model-viewer {
+        order: 0;
+        height: 420px;
+        flex-basis: 100%;
+        border-radius: 12px;
       }
 
-      h1 {
-        font-size: 42px;
+      .loading {
+        top: 210px;
+      }
+
+      .panel {
+        position: static;
+        width: calc(50% - 6px);
+        padding: 12px;
+        order: 1;
+      }
+
+      .panel h2 {
+        font-size: 17px;
+      }
+
+      .panel button {
+        font-size: 11px;
       }
 
       .subtitle {
         font-size: 13px;
-      }
-
-      model-viewer {
-        height: 440px;
-      }
-
-      .viewer-card {
-        border-radius: 18px;
       }
     }
   </style>
@@ -182,27 +264,58 @@
   <main class="container">
 
     <header>
-
-      <p class="eyebrow">
-        Интерактивная 3D-галерея
-      </p>
-
+      <p class="eyebrow">ИНТЕРАКТИВНАЯ 3D-ГАЛЕРЕЯ</p>
       <h1>Хранитель песков</h1>
-
       <p class="subtitle">
         Маленький герой большой истории
       </p>
-
     </header>
-
-    <!-- Трёхмерная модель персонажа -->
 
     <section class="viewer-card">
 
+      <!-- Панель анимаций -->
+
+      <div class="panel panel-left">
+        <h2>Анимация</h2>
+
+        <button id="playPause" disabled>
+          Воспроизвести
+        </button>
+
+        <button id="nextAnimation" disabled>
+          Следующая анимация
+        </button>
+
+        <p class="panel-note" id="animationInfo">
+          Проверяем анимации...
+        </p>
+      </div>
+
+      <!-- Панель эффектов -->
+
+      <div class="panel panel-right">
+        <h2>Эффекты</h2>
+
+        <button id="pixelate">
+          Pixelate
+        </button>
+
+        <button id="glitch">
+          Glitch
+        </button>
+
+        <button id="resetEffects">
+          Сбросить эффекты
+        </button>
+      </div>
+
+      <!-- 3D-модель -->
+
       <model-viewer
         id="model"
+
         src="./3b865256ca794dbda6df29d9bf047c55.glb"
-        alt="Трёхмерная модель Хранителя песков"
+        alt="3D-модель Хранителя песков"
 
         camera-controls
         touch-action="pan-y"
@@ -213,18 +326,17 @@
 
         interaction-prompt="none"
 
-        autoplay
-
-        tone-mapping="neutral"
         shadow-intensity="1.34"
         shadow-softness="0.76"
         exposure="1.29"
 
         camera-orbit="164.9deg 82.04deg 3.304m"
-        field-of-view="30deg"
+        field-of-view="30deg">
 
-        ar
-        ar-modes="webxr scene-viewer quick-look">
+        <!-- Постобработка -->
+
+        <effect-composer id="composer">
+        </effect-composer>
 
       </model-viewer>
 
@@ -235,40 +347,172 @@
     </section>
 
     <footer>
-
-      <p class="footer-main">
-        Лабораторная работа №5
+      <p>Лабораторная работа №6</p>
+      <p class="small">
+        Анимация и визуальные эффекты 3D-модели
       </p>
-
-      <p class="footer-sub">
-        Интерактивная визуализация трёхмерной модели
-      </p>
-
     </footer>
 
   </main>
 
-  <script>
+  <script type="module">
+
     const model = document.getElementById("model");
     const loading = document.getElementById("loading");
 
+    const playPause =
+      document.getElementById("playPause");
+
+    const nextAnimation =
+      document.getElementById("nextAnimation");
+
+    const animationInfo =
+      document.getElementById("animationInfo");
+
+    const pixelateButton =
+      document.getElementById("pixelate");
+
+    const glitchButton =
+      document.getElementById("glitch");
+
+    const resetButton =
+      document.getElementById("resetEffects");
+
+    const composer =
+      document.getElementById("composer");
+
+    let animations = [];
+    let animationIndex = 0;
+
+    let pixelateEnabled = false;
+    let glitchEnabled = false;
+
+    /* Загрузка модели */
+
     model.addEventListener("load", () => {
+
       loading.classList.add("hidden");
+
+      animations = model.availableAnimations || [];
+
+      if (animations.length === 0) {
+        animationInfo.textContent =
+          "В модели нет встроенных анимаций.";
+        return;
+      }
+
+      animationIndex = 0;
+
+      model.animationName = animations[0];
+      model.play();
+
+      playPause.disabled = false;
+      nextAnimation.disabled = animations.length < 2;
+
+      playPause.textContent = "Пауза";
+
+      updateAnimationInfo();
+
     });
 
     model.addEventListener("error", (event) => {
       loading.textContent =
-        "Не удалось загрузить 3D-модель.";
-
-      console.error(
-        "Ошибка загрузки модели:",
-        event
-      );
+        "Ошибка загрузки 3D-модели.";
+      console.error(event);
     });
 
-    if (model.loaded) {
-      loading.classList.add("hidden");
+    /* Управление анимацией */
+
+    function updateAnimationInfo() {
+      animationInfo.textContent =
+        "Анимация " +
+        (animationIndex + 1) +
+        " из " +
+        animations.length +
+        ": " +
+        animations[animationIndex];
     }
+
+    playPause.addEventListener("click", () => {
+
+      if (model.paused) {
+        model.play();
+        playPause.textContent = "Пауза";
+      } else {
+        model.pause();
+        playPause.textContent = "Воспроизвести";
+      }
+
+    });
+
+    nextAnimation.addEventListener("click", () => {
+
+      if (animations.length < 2) return;
+
+      animationIndex =
+        (animationIndex + 1) % animations.length;
+
+      model.animationName = animations[animationIndex];
+      model.play();
+
+      playPause.textContent = "Пауза";
+
+      updateAnimationInfo();
+
+    });
+
+    /* Эффекты */
+
+    function updateEffects() {
+
+      composer.replaceChildren();
+
+      if (pixelateEnabled) {
+
+        const pixelate =
+          document.createElement("pixelate-effect");
+
+        pixelate.setAttribute("granularity", "32");
+
+        composer.appendChild(pixelate);
+      }
+
+      if (glitchEnabled) {
+
+        const glitch =
+          document.createElement("glitch-effect");
+
+        glitch.setAttribute("mode", "constant");
+
+        composer.appendChild(glitch);
+      }
+
+      pixelateButton.classList.toggle(
+        "active", pixelateEnabled
+      );
+
+      glitchButton.classList.toggle(
+        "active", glitchEnabled
+      );
+
+    }
+
+    pixelateButton.addEventListener("click", () => {
+      pixelateEnabled = !pixelateEnabled;
+      updateEffects();
+    });
+
+    glitchButton.addEventListener("click", () => {
+      glitchEnabled = !glitchEnabled;
+      updateEffects();
+    });
+
+    resetButton.addEventListener("click", () => {
+      pixelateEnabled = false;
+      glitchEnabled = false;
+      updateEffects();
+    });
+
   </script>
 
 </body>
